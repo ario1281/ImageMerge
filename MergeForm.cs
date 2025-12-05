@@ -15,7 +15,7 @@ namespace ImageMerge
 
         private string m_dirPath = "";
 
-        private void BtnSrc_Click(object? sender, EventArgs e)
+        private void BtnSrc_Click(object sender, EventArgs e)
         {
             using (var dialog = new FolderBrowserDialog())
             {
@@ -25,7 +25,7 @@ namespace ImageMerge
                 {
                     m_dirPath = dialog.SelectedPath;
                     lblDirName.Text = Path.GetFileName(m_dirPath);
-                    ucComboList1.UpdateComboList(m_dirPath);
+                    ucComboList.UpdateComboList(m_dirPath);
                 }
             }
         }
@@ -37,29 +37,29 @@ namespace ImageMerge
 
             if (string.IsNullOrWhiteSpace(src))
             {
-                MessageBox.Show("ƒtƒHƒ‹ƒ_‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+                MessageBox.Show("ãƒ•ã‚©ãƒ«ãƒ€ã‚’æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
                 return;
             }
 
             btnStart.Enabled = false;
-            lblStatus.Text = "€”õ’†...";
+            lblStatus.Text = "æº–å‚™ä¸­...";
             progressBar1.Value = 0;
 
             var progress = new Progress<int>(value =>
             {
                 progressBar1.Value = value;
-                lblStatus.Text = $"{value}% Š®—¹";
+                lblStatus.Text = $"{value}% å®Œäº†";
             });
 
             try
             {
-                await Task.Run(() => ImageManager.MergeImagesByPrefix(src, dst, progress));
-                lblStatus.Text = "Š®—¹I";
+                await Task.Run(() => ImageManager.SaveImage(pbPreview.Image, m_dirPath, progress));
+                lblStatus.Text = "å®Œäº†ï¼";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ƒGƒ‰[");
-                lblStatus.Text = "ƒGƒ‰[";
+                MessageBox.Show(ex.Message, "ã‚¨ãƒ©ãƒ¼");
+                lblStatus.Text = "ã‚¨ãƒ©ãƒ¼";
             }
             finally
             {
@@ -67,10 +67,9 @@ namespace ImageMerge
             }
         }
 
-
-        private void ucComboList1_ComboListChanged(object sender, EventArgs e)
+        private void ucComboList_ComboListChanged(object sender, EventArgs e)
         {
-            
+            pbPreview.Image = ImageManager.DrawImage(ucComboList.RawList);
         }
     }
 }
