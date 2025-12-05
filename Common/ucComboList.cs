@@ -1,16 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ImageMerge.Common;
-
-using RawFile = ImageMerge.Common.ImageManager.RawFile;
 
 namespace ImageMerge.Common
 {
@@ -19,12 +11,12 @@ namespace ImageMerge.Common
         public event EventHandler<EventArgs> ComboListChanged;
         public class ComboItem
         {
-            public string? Display { get; set; } // 表示用
-            public object? Value { get; set; }   // 実際の値
+            public string Display { get; set; }
+            public object Value { get; set; }
 
-            public override string? ToString()
+            public override string ToString()
             {
-                return Display; // ComboBox には Display を表示
+                return Display;
             }
         }
 
@@ -34,7 +26,11 @@ namespace ImageMerge.Common
         private int m_width;
         private int m_height;
 
-        public List<RawFile> RawList => m_rawList;
+        public List<RawFile> RawList
+        {
+            get { return m_rawList; }
+            private set;
+        }
 
         public ucComboList()
         {
@@ -90,29 +86,28 @@ namespace ImageMerge.Common
                 cb.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
 
                 this.Controls.Add(cb);
-                m_comboList.Add(cb);
-
                 m_rawList.Add(new RawFile());
+                m_comboList.Add(cb);
             }
 
             this.Height = m_height * (m_comboList.Count + 1);
         }
 
-        private void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
+        private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (sender is not ComboBox cb) { return; }
 
-            int index = m_comboList.IndexOf(cb);
-            if (index < 0) { return; }
+            int idx = m_comboList.IndexOf(cb);
+            if (idx < 0) { return; }
 
             if (cb.SelectedItem is ComboItem item)
             {
-                m_rawList[index]
+                m_rawList[idx]
                     = item.Value as RawFile? ?? new RawFile();
             }
             else
             {
-                m_rawList[index] = new RawFile();
+                m_rawList[idx] = new RawFile();
             }
 
             OnComboListChanged(e);
@@ -120,7 +115,7 @@ namespace ImageMerge.Common
 
         protected virtual void OnComboListChanged(EventArgs e)
         {
-            ComboListChanged?.Invoke(this, e);
+            ComboListChanged.Invoke(this, e);
         }
     }
 }
