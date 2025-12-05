@@ -26,6 +26,8 @@ namespace ImageMerge
                     m_dirPath = dialog.SelectedPath;
                     lblDirName.Text = Path.GetFileName(m_dirPath);
                     ucComboList.UpdateComboList(m_dirPath);
+
+                    DrawImage();
                 }
             }
         }
@@ -53,7 +55,7 @@ namespace ImageMerge
 
             try
             {
-                await Task.Run(() => ImageManager.SaveImage(pbPreview.Image, m_dirPath, progress));
+                await Task.Run(() => ImageManager.SaveImage(pbPreview.Image, dst, progress));
                 lblStatus.Text = "完了！";
             }
             catch (Exception ex)
@@ -68,6 +70,11 @@ namespace ImageMerge
         }
 
         private void ucComboList_ComboListChanged(object sender, EventArgs e)
+        {
+            DrawImage();
+        }
+
+        private void DrawImage()
         {
             pbPreview.Image = ImageManager.DrawImage(ucComboList.RawList);
         }

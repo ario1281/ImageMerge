@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Formats.Tar;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -63,17 +64,20 @@ namespace ImageMerge.Common
 
                 cb.DropDownStyle = ComboBoxStyle.DropDownList;
 
-                cb.Items.Add("");
+                cb.Items.Add(new ComboItem {
+                    Display = "",
+                    Value = new RawFile(),
+                });
                 rawFiles.Select(x => x.Value)
                     .Where(x => x.group == group.val)
                     .OrderBy(x => x.number)
                     .ToList()
-                    .ForEach(x =>
+                    .ForEach(rf =>
                     {
                         var item = new ComboItem
                         {
-                            Display = $"{x.group}{x.number:000}.png",
-                            Value = rawFiles,
+                            Display = $"{rf.group}{rf.number:000}.png",
+                            Value = rf,
                         };
                         cb.Items.Add(item);
                     });
@@ -83,10 +87,12 @@ namespace ImageMerge.Common
                 cb.Left = 0;
                 cb.Width = 120;
 
+                cb.SelectedIndex = 1;
+
                 cb.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
 
                 this.Controls.Add(cb);
-                m_rawList.Add(new RawFile());
+                m_rawList.Add(SetRawFile((ComboItem)cb.SelectedItem));
                 m_comboList.Add(cb);
             }
 
@@ -100,17 +106,19 @@ namespace ImageMerge.Common
             int idx = m_comboList.IndexOf(cb);
             if (idx < 0) { return; }
 
-            if (cb.SelectedItem is ComboItem item)
-            {
-                m_rawList[idx]
-                    = item.Value as RawFile? ?? new RawFile();
-            }
-            else
-            {
-                m_rawList[idx] = new RawFile();
-            }
+            m_rawList[idx] = SetRawFile((ComboItem)cb.SelectedItem);
 
             OnComboListChanged(e);
+        }
+
+        private RawFile SetRawFile(ComboItem item)
+        {
+            if (item != null && item.Value is RawFile rawFile)
+            {
+                return rawFile;
+            }
+
+            return new RawFile();
         }
 
         protected virtual void OnComboListChanged(EventArgs e)

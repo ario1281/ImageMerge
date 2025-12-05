@@ -37,7 +37,7 @@ namespace ImageMerge
             pbPreview = new PictureBox();
             lblDirName = new Label();
             panel1 = new Panel();
-            ucComboList1 = new ImageMerge.Common.ucComboList();
+            ucComboList = new ImageMerge.Common.ucComboList();
             ((System.ComponentModel.ISupportInitialize)pbPreview).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -82,6 +82,7 @@ namespace ImageMerge
             pbPreview.Location = new Point(14, 41);
             pbPreview.Name = "pbPreview";
             pbPreview.Size = new Size(686, 408);
+            pbPreview.SizeMode = PictureBoxSizeMode.Zoom;
             pbPreview.TabIndex = 7;
             pbPreview.TabStop = false;
             // 
@@ -96,19 +97,19 @@ namespace ImageMerge
             // panel1
             // 
             panel1.AutoScroll = true;
-            panel1.Controls.Add(ucComboList1);
+            panel1.Controls.Add(ucComboList);
             panel1.Location = new Point(706, 12);
             panel1.Name = "panel1";
             panel1.Size = new Size(172, 437);
             panel1.TabIndex = 10;
             // 
-            // ucComboList1
+            // ucComboList
             // 
-            ucComboList1.Location = new Point(9, 8);
-            ucComboList1.Name = "ucComboList1";
-            ucComboList1.Size = new Size(140, 30);
-            ucComboList1.TabIndex = 11;
-            ucComboList1.ComboListChanged += ucComboList1_ComboListChanged;
+            ucComboList.Location = new Point(9, 8);
+            ucComboList.Name = "ucComboList";
+            ucComboList.Size = new Size(140, 30);
+            ucComboList.TabIndex = 11;
+            ucComboList.ComboListChanged += ucComboList_ComboListChanged;
             // 
             // MergeForm
             // 
@@ -140,6 +141,6 @@ namespace ImageMerge
         private PictureBox pbPreview;
         private Label lblDirName;
         private Panel panel1;
-        private Common.ucComboList ucComboList1;
+        private Common.ucComboList ucComboList;
     }
 }

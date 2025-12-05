@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -14,7 +16,7 @@ namespace ImageMerge.Common
     {
         public Bitmap image;
         public string group;
-        public int    number;
+        public int number;
         public string suffix;
     }
 
@@ -38,8 +40,8 @@ namespace ImageMerge.Common
 
                     return new RawFile
                     {
-                        image  = new Bitmap(path),
-                        group  = m.Groups["group"].Value.ToLower(),
+                        image = new Bitmap(path),
+                        group = m.Groups["group"].Value.ToLower(),
                         number = int.Parse(m.Groups["number"].Value),
                         suffix = m.Groups["suffix"].Value
                     };
@@ -79,7 +81,7 @@ namespace ImageMerge.Common
 
                 foreach (var mergeFile in mergeFiles)
                 {
-                    currBaseFile.image = MergeImage(currBaseFile.image, mergeFile.Value.image);
+                    currBaseFile.image = MergeImage(currBaseFile.image, mergeFile.Value.image, true);
                 }
                 rawFiles.Add(currBaseFile);
             }
@@ -89,11 +91,18 @@ namespace ImageMerge.Common
 
         public static Image DrawImage(List<RawFile> rawFiles)
         {
-            var outImg = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
+            if (rawFiles == null || rawFiles.Count <= 0)
+            {
+                return new Bitmap("");
+            }
+
+            var image = rawFiles[1].image;
+            var size = image != null ? new Size(image.Width, image.Height) : new Size(1, 1);
+            var outImg = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
 
             foreach (var rawFile in rawFiles)
             {
-                MergeImage(outImg, rawFile.image);
+                outImg = MergeImage(outImg, rawFile.image);
             }
 
             return outImg;
@@ -102,19 +111,41 @@ namespace ImageMerge.Common
         public static void SaveImage(Image img, string outDir, IProgress<int> progress = null)
         {
             Directory.CreateDirectory(outDir);
-            img.Save(outDir, ImageFormat.Png);
+
+            string baseName = "output";
+            string ext = ".png";
+            string filePath = Path.Combine(outDir, baseName + ext);
+
+            int cnt = 0;
+
+            do
+            {
+                filePath = Path.Combine(outDir, $"{baseName}({cnt}){ext}");
+                cnt++;
+            }
+            while (File.Exists(filePath));
+
+            img.Save(filePath, ImageFormat.Png);
         }
 
-        private static Bitmap MergeImage(in Image @base, in Image merge, float scale = 1f, float opacity = 1f)
+        private static Bitmap MergeImage(Image img1, Image img2, bool isInv = false, float scale = 1f, float opacity = 1f)
         {
-            var result = new Bitmap(@base.Width, @base.Height, PixelFormat.Format32bppArgb);
+            if (img1 == null) { img1 = new Bitmap(1, 1, PixelFormat.Format32bppArgb); }
+            if (img2 == null) { img2 = new Bitmap(1, 1, PixelFormat.Format32bppArgb); }
+
+            var baseImg = !isInv ? img1 : img2;
+            var mergeImg = !isInv ? img2 : img1;
+
+            int w = Math.Max(baseImg.Width, mergeImg.Width);
+            int h = Math.Max(baseImg.Height, mergeImg.Height);
+            var result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
 
             // calc scale
-            int width = Math.Max(1, (int)Math.Round(merge.Width * scale));
-            int height = Math.Max(1, (int)Math.Round(merge.Height * scale));
+            int mw = Math.Max(1, (int)Math.Round(mergeImg.Width * scale));
+            int mh = Math.Max(1, (int)Math.Round(mergeImg.Height * scale));
 
             using (var g = Graphics.FromImage(result))
-            using (var _merge = new Bitmap(merge, new Size(width, height)))
+            using (var smi = new Bitmap(mergeImg, new Size(mw, mh)))
             {
                 // quality seting
                 g.CompositingMode = CompositingMode.SourceOver;
@@ -123,29 +154,21 @@ namespace ImageMerge.Common
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                g.DrawImage(@base, 0, 0, @base.Width, @base.Height);
+                g.DrawImage(baseImg, 0, 0, baseImg.Width, baseImg.Height);
 
                 // setting alpha
                 float alpha = Math.Max(0f, Math.Min(1f, opacity));
-                var cm = new ColorMatrix
-                {
-                    Matrix00 = 1f,
-                    Matrix11 = 1f,
-                    Matrix22 = 1f,
-                    Matrix33 = alpha,
-                    Matrix44 = 1f
-                };
+                var cm = new ColorMatrix();
+                cm.Matrix33 = alpha;
 
                 using (var attrs = new ImageAttributes())
                 {
                     attrs.SetColorMatrix(cm);
 
-                    var destRect = new Rectangle(0, 0, _merge.Width, _merge.Height);
-
                     g.DrawImage(
-                        _merge,
-                        destRect,
-                        0, 0, _merge.Width, _merge.Height,
+                        smi,
+                        new Rectangle(0, 0, smi.Width, smi.Height),
+                        0, 0, smi.Width, smi.Height,
                         GraphicsUnit.Pixel,
                         attrs
                     );
