@@ -20,31 +20,69 @@ namespace ImageMerge.Common
 
     internal class ImageManager
     {
-        private static readonly Regex m_regex
-            = new Regex(
-                @"^(?<group>[a-z])(?<num>\d{3})(?<suffix>j)?\.png$",
-                RegexOptions.IgnoreCase
-            );
-
         public static bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
         {
-            rawFiles = Directory.GetFiles(dir, "*.png")
+            rawFiles = new List<RawFile?>();
+
+            var initFiles = Directory.GetFiles(dir, "*.png")
                 .Select(path =>
                 {
                     var name = Path.GetFileName(path);
-                    var m = m_regex.Match(name);
+                    Regex regex
+                        = new Regex(
+                            @"^(?<group>[a-z])(?<number>\d{3})(?<suffix>j)?\.png$",
+                            RegexOptions.IgnoreCase
+                        );
+                    var m = regex.Match(name);
                     if (!m.Success) return (RawFile?)null;
 
                     return new RawFile
                     {
                         image  = new Bitmap(path),
                         group  = m.Groups["group"].Value.ToLower(),
-                        number = int.Parse(m.Groups["num"].Value),
+                        number = int.Parse(m.Groups["number"].Value),
                         suffix = m.Groups["suffix"].Value
                     };
                 })
                 .Where(x => x != null)
                 .ToList();
+
+            if (!initFiles.Any())
+            {
+                return false;
+            }
+
+
+            var groupFiles = initFiles.GroupBy(rf => new { rf.Value.group, rf.Value.number });
+
+            foreach (var group in groupFiles)
+            {
+                string grpKey = $"{group.Key.group}{group.Key.number}";
+                RawFile baseFile = (RawFile)group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
+
+                if (string.IsNullOrEmpty(baseFile.suffix) == false)
+                {
+                    Console.WriteLine($"警告: 基本ファイルが見つかりません: {grpKey}。このグループはスキップされます。");
+                    foreach (var dispose in group)
+                    {
+                        dispose.Value.image?.Dispose();
+                    }
+                    continue;
+                }
+
+                var currBaseFile = baseFile;
+
+                var mergeFiles = group
+                    .Where(rf => !string.IsNullOrEmpty(rf.Value.suffix))
+                    .OrderBy(rf => rf.Value.suffix)
+                    .ToList();
+
+                foreach (var mergeFile in mergeFiles)
+                {
+                    currBaseFile.image = MergeImage(currBaseFile.image, mergeFile.Value.image);
+                }
+                rawFiles.Add(currBaseFile);
+            }
 
             return rawFiles.Any();
         }
@@ -67,7 +105,7 @@ namespace ImageMerge.Common
             img.Save(outDir, ImageFormat.Png);
         }
 
-        private static Image MergeImage(in Image @base, in Image merge, float scale = 1f, float opacity = 1f)
+        private static Bitmap MergeImage(in Image @base, in Image merge, float scale = 1f, float opacity = 1f)
         {
             var result = new Bitmap(@base.Width, @base.Height, PixelFormat.Format32bppArgb);
 
