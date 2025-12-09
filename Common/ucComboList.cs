@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Formats.Tar;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace ImageMerge.Common
@@ -41,9 +43,36 @@ namespace ImageMerge.Common
             m_height = this.Height;
         }
 
+        private RawFile SetRawFile(ComboItem item)
+        {
+            if (item != null && item.Value is RawFile rawFile)
+            {
+                return rawFile;
+            }
+
+            return new RawFile();
+        }
+
+        protected virtual void OnComboListChanged(EventArgs e)
+        {
+            ComboListChanged.Invoke(this, e);
+        }
+
+        private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender is not ComboBox cb) { return; }
+
+            int idx = m_comboList.IndexOf(cb);
+            if (idx < 0) { return; }
+
+            m_rawList[idx] = SetRawFile((ComboItem)cb.SelectedItem);
+
+            OnComboListChanged(e);
+        }
+
         public void UpdateComboList(string dir)
         {
-            if (!ImageManager.FileAnalysis(dir, out var rawFiles))
+            if (!FileAnalysis(dir, out var rawFiles))
             {
                 return;
             }
@@ -64,10 +93,6 @@ namespace ImageMerge.Common
 
                 cb.DropDownStyle = ComboBoxStyle.DropDownList;
 
-                cb.Items.Add(new ComboItem {
-                    Display = "",
-                    Value = new RawFile(),
-                });
                 rawFiles.Select(x => x.Value)
                     .Where(x => x.group == group.val)
                     .OrderBy(x => x.number)
@@ -81,13 +106,18 @@ namespace ImageMerge.Common
                         };
                         cb.Items.Add(item);
                     });
+                cb.Items.Add(new ComboItem
+                {
+                    Display = "",
+                    Value = new RawFile(),
+                });
 
                 // Set default selection
                 cb.Top = 3 + group.idx * 35;
                 cb.Left = 0;
                 cb.Width = 120;
 
-                cb.SelectedIndex = 1;
+                cb.SelectedIndex = 0;
 
                 cb.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
 
@@ -99,31 +129,82 @@ namespace ImageMerge.Common
             this.Height = m_height * (m_comboList.Count + 1);
         }
 
-        private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private static bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
         {
-            if (sender is not ComboBox cb) { return; }
+            rawFiles = new List<RawFile?>();
 
-            int idx = m_comboList.IndexOf(cb);
-            if (idx < 0) { return; }
+            var initFiles = Directory.GetFiles(dir, "*.png")
+                .Select(path =>
+                {
+                    var name = Path.GetFileName(path);
+                    Regex regex
+                        = new Regex(
+                            @"^(?<group>[a-z])(?<number>\d{3})(?<suffix>j)?\.png$",
+                            RegexOptions.IgnoreCase
+                        );
+                    var m = regex.Match(name);
+                    if (!m.Success) { return (RawFile?)null; }
 
-            m_rawList[idx] = SetRawFile((ComboItem)cb.SelectedItem);
+                    try
+                    {
+                        return new RawFile
+                        {
+                            image = new Bitmap(path),
+                            group = m.Groups["group"].Value.ToLower(),
+                            number = int.Parse(m.Groups["number"].Value),
+                            suffix = m.Groups["suffix"].Value
+                        };
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                })
+                .Where(rf => rf != null)
+                .ToList();
 
-            OnComboListChanged(e);
-        }
+            if (initFiles.Count <= 0) { return false; }
 
-        private RawFile SetRawFile(ComboItem item)
-        {
-            if (item != null && item.Value is RawFile rawFile)
+            var groupFiles = initFiles
+                .GroupBy(rf => new {
+                    rf.Value.group,
+                    rf.Value.number,
+                });
+            foreach (var group in groupFiles)
             {
-                return rawFile;
+                var baseFile = group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
+
+                if (baseFile == null)
+                {
+                    foreach (var rf in group)
+                    {
+                        rf.Value.image?.Dispose();
+                    }
+                    continue;
+                }
+
+                var mergeFiles = group
+                    .Where(rf => !string.IsNullOrEmpty(rf.Value.suffix))
+                    .OrderBy(rf => rf.Value.suffix)
+                    .ToList();
+
+                var currFile = (RawFile)baseFile;
+                foreach (var mf in mergeFiles)
+                {
+                    try
+                    {
+                        currFile.image
+                            = ImageManager.MergeImage(currFile.image, mf.Value.image, true);
+                    }
+                    finally
+                    {
+                        mf.Value.image?.Dispose();
+                    }
+                }
+                rawFiles.Add(currFile);
             }
 
-            return new RawFile();
-        }
-
-        protected virtual void OnComboListChanged(EventArgs e)
-        {
-            ComboListChanged.Invoke(this, e);
+            return rawFiles.Count <= 0;
         }
     }
 }
