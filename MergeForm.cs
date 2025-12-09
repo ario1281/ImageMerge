@@ -1,13 +1,18 @@
 using ImageMerge.Common;
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ImageMerge
 {
     public partial class MergeForm : Form
     {
+        private static string m_outName = "out";
+
         private string m_dirPath = "";
 
         public MergeForm()
@@ -55,7 +60,7 @@ namespace ImageMerge
 
             try
             {
-                await Task.Run(() => ImageManager.SaveImage(pbPreview.Image, dst, progress));
+                await Task.Run(() => SaveImage((Bitmap)pbPreview.Image, dst, progress));
                 lblStatus.Text = "完了！";
             }
             catch (Exception ex)
@@ -76,7 +81,39 @@ namespace ImageMerge
 
         private void DrawImage()
         {
-            pbPreview.Image = ImageManager.DrawImage(ucComboList.RawList);
+            var rawFiles = ucComboList.RawList;
+
+            if (rawFiles == null || rawFiles.Count <= 0)
+            {
+                return;
+            }
+
+            var img = rawFiles[0].image;
+            var size = img != null ? img.Size : new Size(1, 1);
+
+            var result = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
+            foreach (var rawFile in rawFiles)
+            {
+                result = ImageManager.MergeImage(result, rawFile.image);
+            }
+
+            pbPreview.Image = result;
+        }
+
+        private static void SaveImage(Bitmap img, string outDir, IProgress<int> progress = null)
+        {
+            Directory.CreateDirectory(outDir);
+            string filePath = "";
+
+            int cnt = 0;
+            do
+            {
+                filePath = Path.Combine(outDir, $"{m_outName}_{cnt:000}.png");
+                cnt++;
+            }
+            while (File.Exists(filePath));
+
+            img.Save(filePath, ImageFormat.Png);
         }
     }
 }
