@@ -1,19 +1,16 @@
-using System.Drawing;
-using System.Windows.Forms;﻿
-
 namespace ImageMerge
 {
     partial class MergeForm
     {
         /// <summary>
-        ///  Required designer variable.
+        /// 必要なデザイナー変数です。
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
-        ///  Clean up any resources being used.
+        /// 使用中のリソースをすべてクリーンアップします。
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing">マネージド リソースを破棄する場合は true を指定し、その他の場合は false を指定します。</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -23,125 +20,123 @@ namespace ImageMerge
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Windows フォーム デザイナーで生成されたコード
 
         /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
+        /// デザイナー サポートに必要なメソッドです。このメソッドの内容を
+        /// コード エディターで変更しないでください。
         /// </summary>
         private void InitializeComponent()
         {
-            btnSrc = new Button();
-            btnStart = new Button();
-            progressBar1 = new ProgressBar();
-            lblStatus = new Label();
-            pbPreview = new PictureBox();
-            lblDirName = new Label();
-            panel1 = new Panel();
-            ucComboList = new ImageMerge.Common.ucComboList();
-            ((System.ComponentModel.ISupportInitialize)pbPreview).BeginInit();
-            panel1.SuspendLayout();
-            SuspendLayout();
+            this.btnSrc = new System.Windows.Forms.Button();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.pbPreview = new System.Windows.Forms.PictureBox();
+            this.lblDirName = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.ucComboList = new ImageMerge.Common.ucComboList();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.SuspendLayout();
             // 
             // btnSrc
             // 
-            btnSrc.Location = new Point(16, 12);
-            btnSrc.Name = "btnSrc";
-            btnSrc.Size = new Size(86, 23);
-            btnSrc.TabIndex = 1;
-            btnSrc.Text = "ファイル選択";
-            btnSrc.Click += BtnSrc_Click;
+            this.btnSrc.Location = new System.Drawing.Point(16, 12);
+            this.btnSrc.Name = "btnSrc";
+            this.btnSrc.Size = new System.Drawing.Size(86, 23);
+            this.btnSrc.TabIndex = 1;
+            this.btnSrc.Text = "ファイル選択";
             // 
             // btnStart
             // 
-            btnStart.Location = new Point(789, 463);
-            btnStart.Name = "btnStart";
-            btnStart.Size = new Size(75, 23);
-            btnStart.TabIndex = 4;
-            btnStart.Text = "Save";
-            btnStart.Click += BtnStart_Click;
+            this.btnStart.Location = new System.Drawing.Point(789, 463);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(75, 23);
+            this.btnStart.TabIndex = 4;
+            this.btnStart.Text = "Save";
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(300, 463);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(310, 23);
-            progressBar1.TabIndex = 5;
+            this.progressBar1.Location = new System.Drawing.Point(300, 463);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(310, 23);
+            this.progressBar1.TabIndex = 5;
             // 
             // lblStatus
             // 
-            lblStatus.Location = new Point(626, 463);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(154, 23);
-            lblStatus.TabIndex = 6;
-            lblStatus.Text = "待機中";
-            lblStatus.TextAlign = ContentAlignment.MiddleLeft;
+            this.lblStatus.Location = new System.Drawing.Point(626, 463);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(150, 20);
+            this.lblStatus.TabIndex = 6;
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // pbPreview
             // 
-            pbPreview.BackColor = Color.Silver;
-            pbPreview.Location = new Point(14, 41);
-            pbPreview.Name = "pbPreview";
-            pbPreview.Size = new Size(686, 408);
-            pbPreview.SizeMode = PictureBoxSizeMode.Zoom;
-            pbPreview.TabIndex = 7;
-            pbPreview.TabStop = false;
+            this.pbPreview.BackColor = System.Drawing.Color.Silver;
+            this.pbPreview.Location = new System.Drawing.Point(14, 41);
+            this.pbPreview.Name = "pbPreview";
+            this.pbPreview.Size = new System.Drawing.Size(686, 408);
+            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbPreview.TabIndex = 7;
+            this.pbPreview.TabStop = false;
             // 
             // lblDirName
             // 
-            lblDirName.AutoSize = true;
-            lblDirName.Location = new Point(109, 16);
-            lblDirName.Name = "lblDirName";
-            lblDirName.Size = new Size(0, 15);
-            lblDirName.TabIndex = 8;
+            this.lblDirName.AutoSize = true;
+            this.lblDirName.Location = new System.Drawing.Point(109, 16);
+            this.lblDirName.Name = "lblDirName";
+            this.lblDirName.Size = new System.Drawing.Size(0, 12);
+            this.lblDirName.TabIndex = 8;
             // 
             // panel1
             // 
-            panel1.AutoScroll = true;
-            panel1.Controls.Add(ucComboList);
-            panel1.Location = new Point(706, 12);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(172, 437);
-            panel1.TabIndex = 10;
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.ucComboList);
+            this.panel1.Location = new System.Drawing.Point(706, 12);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(172, 437);
+            this.panel1.TabIndex = 10;
             // 
             // ucComboList
             // 
-            ucComboList.Location = new Point(9, 8);
-            ucComboList.Name = "ucComboList";
-            ucComboList.Size = new Size(140, 30);
-            ucComboList.TabIndex = 11;
-            ucComboList.ComboListChanged += ucComboList_ComboListChanged;
+            this.ucComboList.Location = new System.Drawing.Point(9, 8);
+            this.ucComboList.Name = "ucComboList";
+            this.ucComboList.Size = new System.Drawing.Size(140, 30);
+            this.ucComboList.TabIndex = 11;
             // 
             // MergeForm
             // 
-            AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(890, 499);
-            Controls.Add(panel1);
-            Controls.Add(lblDirName);
-            Controls.Add(pbPreview);
-            Controls.Add(btnSrc);
-            Controls.Add(btnStart);
-            Controls.Add(progressBar1);
-            Controls.Add(lblStatus);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            MaximizeBox = false;
-            MinimumSize = new Size(390, 240);
-            Name = "MergeForm";
-            Text = "Image Merger";
-            ((System.ComponentModel.ISupportInitialize)pbPreview).EndInit();
-            panel1.ResumeLayout(false);
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.ClientSize = new System.Drawing.Size(890, 499);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.lblDirName);
+            this.Controls.Add(this.pbPreview);
+            this.Controls.Add(this.btnSrc);
+            this.Controls.Add(this.btnStart);
+            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.lblStatus);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(390, 240);
+            this.Name = "MergeForm";
+            this.Text = "Image Merger";
+            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
-        private Button btnSrc;
-        private Button btnStart;
-        private ProgressBar progressBar1;
-        private Label lblStatus;
-        private PictureBox pbPreview;
-        private Label lblDirName;
-        private Panel panel1;
+        private System.Windows.Forms.Button btnSrc;
+        private System.Windows.Forms.Button btnStart;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.PictureBox pbPreview;
+        private System.Windows.Forms.Label lblDirName;
+        private System.Windows.Forms.Panel panel1;
         private Common.ucComboList ucComboList;
     }
 }
+
