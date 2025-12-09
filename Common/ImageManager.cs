@@ -18,9 +18,9 @@ namespace ImageMerge.Common
     }
     internal class ImageManager
     {
-        public static bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
+        public static bool FileAnalysis(string dir, out List<RawFile> rawFiles)
         {
-            rawFiles = new List<RawFile?>();
+            rawFiles = new List<RawFile>();
 
             var initFiles = Directory.GetFiles(dir, "*.png")
                 .Select(path =>
@@ -55,12 +55,11 @@ namespace ImageMerge.Common
 
             foreach (var group in groupFiles)
             {
-                string _key = $"{group.Key.group}{group.Key.number}";
-                RawFile baseFile = (RawFile)group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
+                var baseFile
+                    = (RawFile)group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
 
                 if (!string.IsNullOrEmpty(baseFile.suffix))
                 {
-                    Console.WriteLine($"警告: 基本ファイルが見つかりません: {_key}。このグループはスキップされます。");
                     foreach (var dispose in group)
                     {
                         dispose.Value.image?.Dispose();
@@ -68,22 +67,23 @@ namespace ImageMerge.Common
                     continue;
                 }
 
-                var currBaseFile = baseFile;
-
                 var mergeFiles = group
                     .Where(rf => !string.IsNullOrEmpty(rf.Value.suffix))
                     .OrderBy(rf => rf.Value.suffix)
                     .ToList();
 
+                var currBaseFile = baseFile;
                 foreach (var mergeFile in mergeFiles)
                 {
-                    currBaseFile.image = MergeImage(currBaseFile.image, mergeFile.Value.image, true);
+                    currBaseFile.image
+                        = MergeImage(currBaseFile.image, mergeFile.Value.image, true);
                 }
                 rawFiles.Add(currBaseFile);
             }
 
             return rawFiles.Any();
         }
+
 
         public static Image DrawImage(List<RawFile> rawFiles)
         {
