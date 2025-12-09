@@ -35,14 +35,6 @@ namespace ImageMerge.Common
             private set;
         }
 
-        public ucComboList()
-        {
-            InitializeComponent();
-
-            m_width = this.Width;
-            m_height = this.Height;
-        }
-
         private RawFile SetRawFile(ComboItem item)
         {
             if (item != null && item.Value is RawFile rawFile)
@@ -53,9 +45,13 @@ namespace ImageMerge.Common
             return new RawFile();
         }
 
-        protected virtual void OnComboListChanged(EventArgs e)
+
+        public ucComboList()
         {
-            ComboListChanged.Invoke(this, e);
+            InitializeComponent();
+
+            m_width = this.Width;
+            m_height = this.Height;
         }
 
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -68,6 +64,11 @@ namespace ImageMerge.Common
             m_rawList[idx] = SetRawFile((ComboItem)cb.SelectedItem);
 
             OnComboListChanged(e);
+        }
+
+        protected virtual void OnComboListChanged(EventArgs e)
+        {
+            ComboListChanged.Invoke(this, e);
         }
 
         public void UpdateComboList(string dir)
@@ -129,7 +130,7 @@ namespace ImageMerge.Common
             this.Height = m_height * (m_comboList.Count + 1);
         }
 
-        private static bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
+        private bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
         {
             rawFiles = new List<RawFile?>();
 
