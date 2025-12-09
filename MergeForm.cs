@@ -10,7 +10,7 @@ namespace ImageMerge
 {
     public partial class MergeForm : Form
     {
-        private static string m_outName = "out";
+        private static string m_outName = "outimg";
 
         private string m_dirPath = "";
 
