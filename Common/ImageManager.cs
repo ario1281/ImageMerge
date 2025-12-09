@@ -211,6 +211,56 @@ namespace ImageMerge.Common
         }
 
         /// <summary>
+        /// 画像を指定の倍率で拡縮する（高品質変換）。
+        /// </summary>
+        /// <param name="_in">入力画像</param>
+        /// <param name="wScale">Width 拡縮率</param>
+        /// <param name="hScale">Height 拡縮率</param>
+        /// <returns>変更後の画像</returns>
+        private static Bitmap ScaleImage(Bitmap _in, float wScale, float hScale)
+        {
+            if (_in == null)
+            {
+                throw new ArgumentNullException(nameof(_in), "入力画像が null です。");
+            }
+            // calc scale
+            int sw = Math.Max(1, (int)Math.Round(_in.Width * wScale));
+            int sh = Math.Max(1, (int)Math.Round(_in.Height * hScale));
+
+            var result = new Bitmap(sw, sh, PixelFormat.Format32bppArgb);
+
+            using (var g = Graphics.FromImage(result))
+            {
+                // quality seting
+                g.CompositingMode = CompositingMode.SourceOver;
+                g.CompositingQuality = CompositingQuality.HighQuality;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                g.DrawImage(
+                    _in,
+                    new Rectangle(0, 0, sw, sh),
+                    0, 0, _in.Width, _in.Height,
+                    GraphicsUnit.Pixel
+                );
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 画像を指定の倍率で拡縮する（高品質変換）。
+        /// </summary>
+        /// <param name="_in">入力画像</param>
+        /// <param name="scale">Width/Height 拡縮率</param>
+        /// <returns>変更後の画像</returns>
+        private static Bitmap ScaleImage(Bitmap _in, SizeF scale)
+        {
+            return ScaleImage(_in, scale.Width, scale.Height);
+        }
+
+        /// <summary>
         /// 画像を指定の不透明度(α値)で出力する（高品質変換）。
         /// </summary>
         /// <param name="_in">入力画像</param>
