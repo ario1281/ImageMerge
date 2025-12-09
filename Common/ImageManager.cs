@@ -16,11 +16,12 @@ namespace ImageMerge.Common
         public int number;
         public string suffix;
     }
+
     internal class ImageManager
     {
-        public static bool FileAnalysis(string dir, out List<RawFile> rawFiles)
+        public static bool FileAnalysis(string dir, out List<RawFile?> rawFiles)
         {
-            rawFiles = new List<RawFile>();
+            rawFiles = new List<RawFile?>();
 
             var initFiles = Directory.GetFiles(dir, "*.png")
                 .Select(path =>
@@ -32,37 +33,40 @@ namespace ImageMerge.Common
                             RegexOptions.IgnoreCase
                         );
                     var m = regex.Match(name);
-                    if (!m.Success) return (RawFile?)null;
+                    if (!m.Success) { return (RawFile?)null; }
 
-                    return new RawFile
+                    try
                     {
-                        image = new Bitmap(path),
-                        group = m.Groups["group"].Value.ToLower(),
-                        number = int.Parse(m.Groups["number"].Value),
-                        suffix = m.Groups["suffix"].Value
-                    };
+                        return new RawFile
+                        {
+                            image = new Bitmap(path),
+                            group = m.Groups["group"].Value.ToLower(),
+                            number = int.Parse(m.Groups["number"].Value),
+                            suffix = m.Groups["suffix"].Value
+                        };
+                    }
+                    catch
+                    {
+                        return null;
+                    }
                 })
-                .Where(x => x != null)
+                .Where(rf => rf != null)
                 .ToList();
 
-            if (!initFiles.Any())
-            {
-                return false;
-            }
+            if (initFiles.Count <= 0) { return false; }
+
 
 
             var groupFiles = initFiles.GroupBy(rf => new { rf.Value.group, rf.Value.number });
-
             foreach (var group in groupFiles)
             {
-                var baseFile
-                    = (RawFile)group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
+                var baseFile = group.FirstOrDefault(rf => string.IsNullOrEmpty(rf.Value.suffix));
 
-                if (!string.IsNullOrEmpty(baseFile.suffix))
+                if (baseFile == null)
                 {
-                    foreach (var dispose in group)
+                    foreach (var rf in group)
                     {
-                        dispose.Value.image?.Dispose();
+                        rf.Value.image?.Dispose();
                     }
                     continue;
                 }
@@ -72,26 +76,32 @@ namespace ImageMerge.Common
                     .OrderBy(rf => rf.Value.suffix)
                     .ToList();
 
-                var currBaseFile = baseFile;
-                foreach (var mergeFile in mergeFiles)
+                var currFile = (RawFile)baseFile;
+                foreach (var mf in mergeFiles)
                 {
-                    currBaseFile.image
-                        = MergeImage(currBaseFile.image, mergeFile.Value.image, true);
+                    try
+                    {
+                        currFile.image
+                            = MergeImage(currFile.image, mf.Value.image, true);
+                    } 
+                    finally
+                    {
+                        mf.Value.image?.Dispose();
+                    }
                 }
-                rawFiles.Add(currBaseFile);
+                rawFiles.Add(currFile);
             }
 
             return rawFiles.Any();
         }
 
-
-        public static Image DrawImage(List<RawFile> rawFiles)
+        public static Bitmap DrawImage(List<RawFile> rawFiles)
         {
             var result = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
 
             if (rawFiles != null && rawFiles.Count > 0)
             {
-                var img = rawFiles[1].image;
+                var img = rawFiles[0].image;
                 var size = img != null ? new Size(img.Width, img.Height) : new Size(1, 1);
 
                 result = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
@@ -105,7 +115,7 @@ namespace ImageMerge.Common
             return result;
         }
 
-        public static void SaveImage(Image img, string outDir, IProgress<int> progress = null)
+        public static void SaveImage(Bitmap img, string outDir, IProgress<int> progress = null)
         {
             Directory.CreateDirectory(outDir);
 
