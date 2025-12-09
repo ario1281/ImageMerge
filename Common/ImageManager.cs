@@ -120,7 +120,7 @@ namespace ImageMerge.Common
 
             do
             {
-                filePath = Path.Combine(outDir, $"{baseName}({cnt}){ext}");
+                filePath = Path.Combine(outDir, $"{baseName}_{cnt:000}{ext}");
                 cnt++;
             }
             while (File.Exists(filePath));
@@ -128,13 +128,13 @@ namespace ImageMerge.Common
             img.Save(filePath, ImageFormat.Png);
         }
 
-        private static Bitmap MergeImage(Image img1, Image img2, bool isInv = false, float scale = 1f, float opacity = 1f)
+        private static Bitmap MergeImage(Image _in1, Image _in2, bool isInv = false, float scale = 1f, float opacity = 1f)
         {
-            if (img1 == null) { img1 = new Bitmap(1, 1, PixelFormat.Format32bppArgb); }
-            if (img2 == null) { img2 = new Bitmap(1, 1, PixelFormat.Format32bppArgb); }
+            _in1 = _in1 ?? new Bitmap(1, 1, PixelFormat.Format32bppArgb);
+            _in2 = _in2 ?? new Bitmap(1, 1, PixelFormat.Format32bppArgb);
 
-            var baseImg = !isInv ? img1 : img2;
-            var mergeImg = !isInv ? img2 : img1;
+            var baseImg = !isInv ? _in1 : _in2;
+            var mergeImg = isInv ? _in1 : _in2;
 
             int w = Math.Max(baseImg.Width, mergeImg.Width);
             int h = Math.Max(baseImg.Height, mergeImg.Height);
