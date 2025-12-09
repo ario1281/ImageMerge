@@ -150,6 +150,7 @@ namespace ImageMerge.Common
                 string err = "";
                 err += _in1 == null ? $"{nameof(_in1)} & " : "";
                 err += _in2 == null ? $"{nameof(_in2)}" : "";
+
                 throw new ArgumentNullException(err, "入力画像が null です。");
             }
 
@@ -159,8 +160,7 @@ namespace ImageMerge.Common
             int w = Math.Max(frnt.Width, back.Width);
             int h = Math.Max(frnt.Height, back.Height);
 
-            var result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-
+            using (var result = new Bitmap(w, h, PixelFormat.Format32bppArgb))
             using (var g = Graphics.FromImage(result))
             {
                 g.CompositingMode = CompositingMode.SourceOver;
@@ -177,9 +177,9 @@ namespace ImageMerge.Common
                     0, 0, back.Width, back.Height,
                     GraphicsUnit.Pixel
                 );
-            }
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>
@@ -194,12 +194,11 @@ namespace ImageMerge.Common
             {
                 throw new ArgumentNullException(nameof(_in), "入力画像が null です。");
             }
-            // calc scale
+
             int sw = Math.Max(1, (int)Math.Round(_in.Width * scale));
             int sh = Math.Max(1, (int)Math.Round(_in.Height * scale));
 
-            var result = new Bitmap(sw, sh, PixelFormat.Format32bppArgb);
-
+            using (var result = new Bitmap(sw, sh, PixelFormat.Format32bppArgb))
             using (var g = Graphics.FromImage(result))
             {
                 // quality seting
@@ -215,9 +214,9 @@ namespace ImageMerge.Common
                     0, 0, _in.Width, _in.Height,
                     GraphicsUnit.Pixel
                 );
-            }
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>
@@ -233,7 +232,7 @@ namespace ImageMerge.Common
             {
                 throw new ArgumentNullException(nameof(_in), "入力画像が null です。");
             }
-            // calc scale
+
             int sw = Math.Max(1, (int)Math.Round(_in.Width * wScale));
             int sh = Math.Max(1, (int)Math.Round(_in.Height * hScale));
 
@@ -241,7 +240,6 @@ namespace ImageMerge.Common
 
             using (var g = Graphics.FromImage(result))
             {
-                // quality seting
                 g.CompositingMode = CompositingMode.SourceOver;
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.SmoothingMode = SmoothingMode.HighQuality;
@@ -283,11 +281,9 @@ namespace ImageMerge.Common
                 throw new ArgumentNullException(nameof(_in), "入力画像が null です。");
             }
 
-            var result = new Bitmap(_in.Width, _in.Height, PixelFormat.Format32bppArgb);
-
+            using (var result = new Bitmap(_in.Width, _in.Height, PixelFormat.Format32bppArgb))
             using (var g = Graphics.FromImage(result))
             {
-                // quality seting
                 g.CompositingMode = CompositingMode.SourceOver;
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.SmoothingMode = SmoothingMode.HighQuality;
@@ -310,9 +306,9 @@ namespace ImageMerge.Common
                         attrs
                     );
                 }
-            }
 
-            return result;
+                return result;
+            }
         }
     }
 }
