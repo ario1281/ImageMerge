@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace ImageMerge.Common
 {
@@ -17,7 +13,7 @@ namespace ImageMerge.Common
         public string suffix;
     }
 
-    internal class ImageManager
+    internal static class ImageManager
     {
         /// <summary>
         /// 2枚の画像を1枚に合成する（高品質変換）。重ね順の反転可能。<br/>
