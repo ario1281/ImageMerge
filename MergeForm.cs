@@ -8,12 +8,12 @@ namespace ImageMerge
 {
     public partial class MergeForm : Form
     {
+        private string m_dirPath = "";
+
         public MergeForm()
         {
             InitializeComponent();
         }
-
-        private string m_dirPath = "";
 
         private void BtnSrc_Click(object sender, EventArgs e)
         {
