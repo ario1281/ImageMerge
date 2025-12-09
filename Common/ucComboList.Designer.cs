@@ -1,4 +1,4 @@
-﻿namespace ImageMerge.Common
+namespace ImageMerge.Common
 {
     partial class ucComboList
     {
@@ -28,14 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SuspendLayout();
+            this.SuspendLayout();
             // 
             // ucComboList
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             Name = "ucComboList";
-            Size = new Size(140, 30);
+            Size = new System.Drawing.Size(140, 30);
             ResumeLayout(false);
         }
 
