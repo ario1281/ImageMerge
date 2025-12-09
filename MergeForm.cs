@@ -35,7 +35,6 @@ namespace ImageMerge
                 }
             }
         }
-
         private async void BtnStart_Click(object sender, EventArgs e)
         {
             string src = m_dirPath;
@@ -72,7 +71,6 @@ namespace ImageMerge
                 btnStart.Enabled = true;
             }
         }
-
         private void ucComboList_ComboListChanged(object sender, EventArgs e)
         {
             DrawImage();
